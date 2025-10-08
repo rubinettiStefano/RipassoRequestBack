@@ -7,6 +7,7 @@ import com.generation.ripassorequestback.exceptions.InvalidCredentials;
 import com.generation.ripassorequestback.model.entities.User;
 import com.generation.ripassorequestback.model.enums.Role;
 import com.generation.ripassorequestback.model.repositories.UserRepository;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,19 @@ public class UserService
 
     public String register(RegisterDto registerDto)
     {
+
+
+        if(!registerDto.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+            throw new InvalidCredentials("Password not valid");
+
         User user = new User();
         user.setUsername(registerDto.getUsername());
-        user.setPassword(registerDto.getPassword());
+        String hash = DigestUtils.md5Hex(registerDto.getPassword());
+        user.setPassword(hash);
         user.setEmail(registerDto.getEmail());
         user.setRole(Role.STANDARD);
 
+        System.out.println(hash);
         //genero un token in automatico
         user.setToken(UUID.randomUUID().toString());
 
@@ -38,8 +46,8 @@ public class UserService
 
     public String login(LoginDto dto)
     {
-
-        Optional<User> op = repo.findByUsernameAndPassword(dto.getUsername(), dto.getPassword());
+        String hash = DigestUtils.md5Hex(dto.getPassword());
+        Optional<User> op = repo.findByUsernameAndPassword(dto.getUsername(), hash);
 
         if(op.isEmpty())
             throw new InvalidCredentials("Invalid username or password");

@@ -23,6 +23,7 @@ public class UserController
         String tokenUtente = userService.register(dto);
 
         Cookie cookie = new Cookie("token", tokenUtente);
+        cookie.setMaxAge(3600);
         response.addCookie(cookie);
     }
 
@@ -32,12 +33,15 @@ public class UserController
         String tokenUtente = userService.login(dto);
 
         Cookie cookie = new Cookie("token", tokenUtente);
+        cookie.setMaxAge(3600);
         response.addCookie(cookie);
     }
 
     @GetMapping("/userinformation")
-    public UserOutputDto getUserInfo(@CookieValue String token)
+    public UserOutputDto getUserInfo(@CookieValue(required = false) String token)
     {
+        if(token == null)
+            return null;
         return userService.readUserDto(token);
     }
 

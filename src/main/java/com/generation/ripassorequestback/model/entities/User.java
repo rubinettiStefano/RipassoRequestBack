@@ -25,7 +25,6 @@ public class User
     private String username;
     @NotNull @NotBlank @Column(unique = true)
     private String email;
-    @NotNull @NotBlank @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$")
     private String password;
     private String token;
     private Role role;
